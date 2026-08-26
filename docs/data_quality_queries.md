@@ -67,8 +67,6 @@ WHERE order_total IS NULL;
 Finding:
 164 missing order totals...
 
-...
-
 ### Missing Shipping Regions
 
 Checks for missing `region` values inside the `shipping` field.
