@@ -33,7 +33,6 @@ The transformation stage will:
 - Validate item quantities.
 - Preserve missing values where appropriate.
 - Retain currency information.
-- Apply the required order-status logic.
 
 ### Load
 

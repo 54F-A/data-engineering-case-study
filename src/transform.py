@@ -106,11 +106,7 @@ def clean_event(event: dict) -> dict | None:
     """
     Clean and validate a single raw event.
 
-    Returns None if the event should be dropped (missing required fields
-    or an unparseable timestamp). Otherwise returns a cleaned event with
-    parsed timestamp, items, and shipping, plus a quantity validity flag.
-    Fields like order_total, unit_price, and shipping.region are preserved
-    as-is (including None) since they can be legitimately missing.
+    Returns None if the event should be dropped.
     """
 
     if not has_required_fields(event):
