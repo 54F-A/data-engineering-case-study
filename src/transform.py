@@ -86,3 +86,66 @@ def remove_duplicate_events(events: list[dict]) -> list[dict]:
         unique_events.append(event)
 
     return unique_events
+
+def validate_quantities(items: list[dict]) -> bool:
+    """
+    Check whether all items have a valid (positive) quantity.
+
+    Returns False if any item has a missing, zero, or negative qty.
+    """
+
+    for item in items:
+        qty = item.get("qty")
+        if qty is None or qty <= 0:
+            return False
+
+    return True
+
+
+def clean_event(event: dict) -> dict | None:
+    """
+    Clean and validate a single raw event.
+
+    Returns None if the event should be dropped (missing required fields
+    or an unparseable timestamp). Otherwise returns a cleaned event with
+    parsed timestamp, items, and shipping, plus a quantity validity flag.
+    Fields like order_total, unit_price, and shipping.region are preserved
+    as-is (including None) since they can be legitimately missing.
+    """
+
+    if not has_required_fields(event):
+        return None
+
+    parsed_timestamp = parse_timestamp(event.get("event_timestamp"))
+    if parsed_timestamp is None:
+        return None
+
+    items = parse_items(event.get("items"))
+    shipping = parse_shipping(event.get("shipping"))
+
+    return {
+        "event_id": event.get("event_id"),
+        "event_type": event.get("event_type"),
+        "event_timestamp": parsed_timestamp,
+        "order_id": event.get("order_id"),
+        "customer_id": event.get("customer_id"),
+        "order_total": event.get("order_total"),
+        "currency": event.get("currency"),
+        "channel": event.get("channel"),
+        "items": items,
+        "has_valid_quantities": validate_quantities(items),
+        "shipping": shipping,
+        "payment_method": event.get("payment_method"),
+    }
+
+
+def clean_events(events: list[dict]) -> list[dict]:
+    """
+    Deduplicate and clean a list of raw events, dropping any event
+    that fails required-field or timestamp validation.
+    """
+
+    deduped = remove_duplicate_events(events)
+    cleaned = [clean_event(e) for e in deduped]
+
+    return [e for e in cleaned if e is not None]
