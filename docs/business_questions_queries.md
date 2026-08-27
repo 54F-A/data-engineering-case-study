@@ -61,15 +61,12 @@ ORDER BY orders_shipped DESC;
 ```
 
 Finding:
-┌─────────────┬────────────────┐
-│  category   │ orders_shipped │
-│   varchar   │     int64      │
-├─────────────┼────────────────┤
-│ home        │            154 │
-│ grocery     │            152 │
-│ electronics │            133 │
-│ toys        │            132 │
-│ beauty      │            120 │
-│ apparel     │            114 │
-│ sports      │            114 │
-└─────────────┴────────────────┘
+| Category    | Orders Shipped |
+|-------------|-----------------|
+| home        | 154             |
+| grocery     | 152             |
+| electronics | 133             |
+| toys        | 132             |
+| beauty      | 120             |
+| apparel     | 114             |
+| sports      | 114             |

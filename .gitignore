@@ -4,8 +4,8 @@ __pycache__/
 .venv/
 venv/
 
-# Data
-data/raw/
+# Data (raw input is tracked so the repo is reproducible)
+data/processed/
 
 # IDE
 .vscode/
