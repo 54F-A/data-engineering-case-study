@@ -67,3 +67,22 @@ def has_required_fields(event: dict) -> bool:
             return False
 
     return True
+
+def remove_duplicate_events(events: list[dict]) -> list[dict]:
+    """
+    Remove duplicate events based on event_id, keeping the first occurrence.
+    """
+
+    seen_ids = set()
+    unique_events = []
+
+    for event in events:
+        event_id = event.get("event_id")
+
+        if event_id in seen_ids:
+            continue
+
+        seen_ids.add(event_id)
+        unique_events.append(event)
+
+    return unique_events
