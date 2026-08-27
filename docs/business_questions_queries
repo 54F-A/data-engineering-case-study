@@ -1,0 +1,64 @@
+# Business Question Queries
+
+Queries used to answer the two business questions from the case study.
+
+## 1. Active Customers
+
+### Active Orders Count (Validation)
+
+```sql
+WITH order_types AS (
+    SELECT order_id, LIST(DISTINCT event_type) AS types
+    FROM read_json_auto('data/processed/events.json')
+    GROUP BY order_id
+)
+SELECT COUNT(*) AS active_orders
+FROM order_types
+WHERE list_contains(types, 'order_paid')
+  AND NOT list_contains(types, 'order_delivered')
+  AND NOT list_contains(types, 'order_cancelled')
+  AND NOT list_contains(types, 'order_refunded');
+```
+
+Finding:
+133 active orders...
+
+### Active Customers Count
+
+An order is considered active if it has been paid, but has not yet been delivered, cancelled, or refunded.
+
+```sql
+SELECT COUNT(DISTINCT customer_id) AS active_customers
+FROM read_json_auto('data/processed/order_summary.json')
+WHERE is_active = true;
+```
+
+Finding:
+113 customers currently have an active order (lower than the 133 active orders, since a single customer can have more than one active order at a time).
+
+## 2. Orders Shipped in 2024 by Category
+
+### Orders Shipped in 2024, by Category
+
+Filters cleaned events down to `order_shipped` events that occurred in 2024, then unnests the `items` array. Orders are counted as distinct per category.
+
+```sql
+WITH shipped AS (
+    SELECT order_id, items
+    FROM read_json_auto('data/processed/events.json')
+    WHERE event_type = 'order_shipped'
+      AND EXTRACT(YEAR FROM CAST(event_timestamp AS TIMESTAMP)) = 2024
+),
+unique_orders AS (
+    SELECT DISTINCT order_id, item.category AS category
+    FROM shipped,
+         UNNEST(items) AS t(item)
+)
+SELECT category, COUNT(*) AS orders_shipped
+FROM unique_orders
+GROUP BY category
+ORDER BY orders_shipped DESC;
+```
+
+Finding:
+*(paste the category breakdown here once run)*
