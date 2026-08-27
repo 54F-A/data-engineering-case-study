@@ -145,3 +145,37 @@ def clean_events(events: list[dict]) -> list[dict]:
     cleaned = [clean_event(e) for e in deduped]
 
     return [e for e in cleaned if e is not None]
+
+ACTIVE_ORDER_EVENT = "order_paid"
+TERMINAL_ORDER_EVENTS = {"order_delivered", "order_cancelled", "order_refunded"}
+
+
+def group_by_order(events: list[dict]) -> dict[str, list[dict]]:
+    """
+    Group cleaned events by order_id.
+    """
+
+    orders: dict[str, list[dict]] = {}
+
+    for event in events:
+        order_id = event["order_id"]
+        orders.setdefault(order_id, []).append(event)
+
+    return orders
+
+
+def is_order_active(order_events: list[dict]) -> bool:
+    """
+    Determine whether an order is currently active: it has been paid,
+    but has not yet been delivered, cancelled, or refunded.
+    """
+
+    event_types = {e["event_type"] for e in order_events}
+
+    if ACTIVE_ORDER_EVENT not in event_types:
+        return False
+
+    if event_types & TERMINAL_ORDER_EVENTS:
+        return False
+
+    return True

@@ -89,3 +89,26 @@ def clean_events(events: list[dict]) -> list[dict]:
 ```
 
 The top-level entry point that ties everything together: it first removes duplicates with `remove_duplicate_events`, then runs `clean_event` over every remaining event, and finally filters out any event that came back as `None`.
+
+---
+
+## `group_by_order`
+
+```python
+def group_by_order(events: list[dict]) -> dict[str, list[dict]]:
+```
+
+Groups a list of cleaned events by `order_id`, producing a dictionary where each key is an order ID and each value is the list of that order's events.
+
+---
+
+## `is_order_active`
+
+```python
+ACTIVE_ORDER_EVENT = "order_paid"
+TERMINAL_ORDER_EVENTS = {"order_delivered", "order_cancelled", "order_refunded"}
+
+def is_order_active(order_events: list[dict]) -> bool:
+```
+
+Determines whether a single order is currently "active," per the case study spec: an order is active if it has a `order_paid` event, and does **not** have any of the terminal event types (`order_delivered`, `order_cancelled`, `order_refunded`).
